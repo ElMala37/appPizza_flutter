@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tuto/recipe.dart';
+import 'package:tuto/recipeDataBase.dart';
 import 'package:tuto/recipeScreen.dart';
 
 class RecipeListScreen extends StatefulWidget {
@@ -12,46 +13,41 @@ class RecipeListScreen extends StatefulWidget {
 
 class RecipeListScreenState extends State<RecipeListScreen> {
 
-  final List<Recipe> recipes = [
-    Recipe(
-        "Pizza facile",
-        "Par Thomas Mallay",
-        "https://th.bing.com/th/id/OIP.ZZsn6lD6PCjocBzx1tuu1QHaEo?w=292&h=182&c=7&r=0&o=5&pid=1.7",
-        "\nPréparez une pâte à pizza faite maison ou achetée dans le commerce.\n\nÉtalez la pâte sur une plaque de cuisson légèrement farinée.\n\nÉtalez une généreuse couche de sauce tomate ou de sauce tomate assaisonnée sur la pâte.\n\nAjoutez une couche de fromage mozzarella râpé sur la sauce.\n\nPersonnalisez votre pizza avec vos garnitures préférées : pepperoni, champignons, poivrons, oignons, olives, etc.\n\nAssaisonnez avec des herbes italiennes, du sel et du poivre selon votre goût.\n\nPréchauffez votre four à 220°C et enfournez la pizza.\n\nFaites cuire pendant 12 à 15 minutes ou jusqu'à ce que la croûte soit bien dorée et le fromage fondu et légèrement doré.\n\nSortez la pizza du four, laissez-la refroidir légèrement, puis coupez-la en parts égales.\n\nServez et dégustez votre délicieuse pizza faite maison ! Bon appétit !",
-        true,
-        50
-    ),
-    Recipe(
-        "Burger maison",
-        "Par Thomas Mallay",
-        "https://th.bing.com/th/id/R.a54a97f72b1d8a096a52ca62418c3295?rik=Rq7DKMI7TDb1ZA&pid=ImgRaw&r=0",
-        "\nMélangez 500g de viande hachée avec un œuf, de l'ail émincé, du sel et du poivre. \nFaçonnez des steaks et faites-les cuire dans une poêle chaude avec un peu d'huile. \nDans un autre récipient, mélangez mayonnaise, moutarde et ketchup pour préparer la sauce. \nToastez les pains à burger puis assemblez les burgers en ajoutant du fromage, de la salade, des tomates et des oignons. \nServez chaud avec des frites ou des légumes grillés en accompagnement. \nBon appétit!",
-        true,
-        50
-    ),
-  ];
-
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
         title: Text("Mes recettes"),
       ),
-      body: ListView.builder(
-        itemCount: recipes.length,
-        itemBuilder: (context, index){
-          final recipe = recipes[index];
-          return Dismissible(key: Key(recipe.title),
-          onDismissed: (direction){
-            setState((){
-              recipes.removeAt(index);
-          });
-            ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${recipe.title} supprimé")));
-          },
-          background: Container(color: Colors.red),
-          child: RecipeItemWidget(recipe: recipe));
-        },
+      body: FutureBuilder<List<Recipe>>(
+          future : RecipeDataBase.instance.recipes(),
+          builder: (BuildContext context, AsyncSnapshot<List<Recipe>> snapshot) {
+            if (snapshot.hasData) {
+              List<Recipe> recipes = snapshot.data ?? []; // si snapshot est null alors recipes = []
+                return ListView.builder(
+                  itemCount: recipes.length,
+                  itemBuilder: (context, index) {
+                    final recipe = recipes[index];
+                    return Dismissible(
+                      key: Key(recipe.title),
+                      onDismissed: (direction) {
+                        setState(() {
+                          RecipeDataBase.instance.deleteRecipe(recipe.title);
+                          //recipes.removeAt(index);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("${recipe.title} supprimé")));
+                      },
+                      background: Container(color: Colors.red),
+                      child: RecipeItemWidget(recipe: recipe),
+                    );
+                  },
+                );
+            } else {
+              return Center(child: Text("No Data"));
+            }
+
+          }
       ),
     );
   }

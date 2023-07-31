@@ -60,7 +60,7 @@ class RecipeScreen extends StatelessWidget {
     );
 
     return ChangeNotifierProvider(
-      create: (context)=> FavoriteChangeNotifier(recipe.isFavorite, recipe.favoriteCount),
+      create: (context)=> FavoriteChangeNotifier(recipe),
       child: Scaffold(
           appBar: AppBar(
             title: Text("Mes recettes"),
