@@ -74,11 +74,14 @@ class RecipeScreen extends StatelessWidget {
                         height: 240,
                         child: Center(child: CircularProgressIndicator()),
                       ),
-                      Image.network( // si j'utilise Image.network 'https://th.bing.com/th/id/OIP.szvqcft2uwVcYLSH2vvjYgHaE6?pid=ImgDet&rs=1', si j'utilise Image.asset 'images/pizza.jpg',
-                        recipe.imageUrl,
-                        width: 600,
-                        height: 240,
-                        fit: BoxFit.cover, //permet d'afficher au mieux l'image
+                      Hero(
+                        tag: "imageRecipe" + recipe.title,
+                        child: Image.network( // si j'utilise Image.network 'https://th.bing.com/th/id/OIP.szvqcft2uwVcYLSH2vvjYgHaE6?pid=ImgDet&rs=1', si j'utilise Image.asset 'images/pizza.jpg',
+                          recipe.imageUrl,
+                          width: 600,
+                          height: 240,
+                          fit: BoxFit.cover, //permet d'afficher au mieux l'image
+                        ),
                       ),
                     ]
                 ),
